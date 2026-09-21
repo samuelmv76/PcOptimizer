@@ -21,17 +21,40 @@ public sealed class FileAuditLog : IAuditLog
     public string FilePath => _path;
 
     public void Record(string module, string action, string target, bool simulated)
+        => Write(simulated ? "SIMULATED" : "APPLIED", module, action, target, reason: null);
+
+    public void RecordFailure(string module, string action, string target, string reason)
+        => Write("FAILED", module, action, target, reason);
+
+    private void Write(string outcome, string module, string action, string target, string? reason)
     {
-        var line = string.Join('\t',
+        var fields = new List<string>
+        {
             DateTimeOffset.Now.ToString("O", CultureInfo.InvariantCulture),
-            simulated ? "SIMULATED" : "APPLIED",
+            outcome,
             module,
             action,
-            target);
+            target
+        };
+
+        if (reason is not null)
+        {
+            fields.Add(reason);
+        }
+
+        var line = string.Join('\t', fields);
 
         lock (_gate)
         {
-            File.AppendAllText(_path, line + Environment.NewLine, Encoding.UTF8);
+            try
+            {
+                File.AppendAllText(_path, line + Environment.NewLine, Encoding.UTF8);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // El registro es una ayuda, no un requisito: si no se puede
+                // escribir, la operacion del usuario sigue adelante.
+            }
         }
     }
 }

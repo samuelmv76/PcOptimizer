@@ -10,6 +10,8 @@ public abstract class DiagnosticModule : IOptimizerModule
 
     public abstract string DisplayName { get; }
 
+    public virtual string Description => string.Empty;
+
     public virtual bool RequiresElevation => false;
 
     public ModuleKind Kind => ModuleKind.Diagnostic;
@@ -23,6 +25,6 @@ public abstract class DiagnosticModule : IOptimizerModule
         => Task.FromResult(new RemediationResult
         {
             Simulated = options.Simulate,
-            Errors = ["Este modulo solo informa: no aplica cambios."]
+            Errors = ["Este módulo solo informa: no aplica cambios."]
         });
 }

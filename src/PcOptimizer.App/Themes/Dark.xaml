@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tema oscuro, el predeterminado. Grafito en capas: cada superficie un
+         poco mas clara que la de debajo, en vez de separarlas con bordes. -->
+
+    <Color x:Key="TitleBarColor">#FF1E1E20</Color>
+    <Color x:Key="TitleTextColor">#FFF5F5F7</Color>
+    <Color x:Key="ShadowColor">#FF000000</Color>
+
+    <SolidColorBrush x:Key="AppBackground" Color="#FF1C1C1E" />
+    <SolidColorBrush x:Key="SidebarBackground" Color="#FF1E1E20" />
+    <SolidColorBrush x:Key="CardBackground" Color="#FF2C2C2E" />
+    <SolidColorBrush x:Key="CardBorder" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="Separator" Color="#FF38383A" />
+
+    <SolidColorBrush x:Key="TextPrimary" Color="#FFF5F5F7" />
+    <SolidColorBrush x:Key="TextSecondary" Color="#FF98989F" />
+    <SolidColorBrush x:Key="TextTertiary" Color="#FF636366" />
+    <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
+
+    <SolidColorBrush x:Key="Accent" Color="#FF0A84FF" />
+    <SolidColorBrush x:Key="AccentSubtle" Color="#290A84FF" />
+
+    <SolidColorBrush x:Key="ControlBackground" Color="#FF3A3A3C" />
+    <SolidColorBrush x:Key="ControlBorder" Color="#FF545458" />
+    <SolidColorBrush x:Key="HoverOverlay" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="PressedOverlay" Color="#29FFFFFF" />
+
+    <SolidColorBrush x:Key="SidebarItemHover" Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="SidebarItemSelected" Color="#1FFFFFFF" />
+
+    <SolidColorBrush x:Key="RowHover" Color="#0AFFFFFF" />
+    <SolidColorBrush x:Key="RowSelected" Color="#1A0A84FF" />
+
+    <SolidColorBrush x:Key="WarningBackground" Color="#26FF9F0A" />
+    <SolidColorBrush x:Key="WarningBorder" Color="#66FF9F0A" />
+    <SolidColorBrush x:Key="WarningText" Color="#FFFFB340" />
+
+    <SolidColorBrush x:Key="ScrollThumb" Color="#40FFFFFF" />
+    <SolidColorBrush x:Key="ScrollThumbHover" Color="#73FFFFFF" />
+
+    <SolidColorBrush x:Key="ToggleOff" Color="#FF48484A" />
+    <SolidColorBrush x:Key="SegmentBackground" Color="#FF1C1C1E" />
+    <SolidColorBrush x:Key="SegmentSelected" Color="#FF636366" />
+
+    <SolidColorBrush x:Key="Success" Color="#FF30D158" />
+
+</ResourceDictionary>

@@ -26,6 +26,9 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
 
     public override string DisplayName => "Firmware y BIOS";
 
+    public override string Description =>
+        "Ajustes de firmware que afectan al rendimiento y a la compatibilidad, con el menú exacto de tu placa donde se cambian. Para entrar en la BIOS sin pulsar teclas, usa Arranque y BIOS.";
+
     public override Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -36,9 +39,9 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
         var findings = new List<Finding>
         {
             CheckFirmwareType(),
-            CheckSecureBoot(),
+            CheckSecureBoot(profile),
             CheckVirtualization(profile),
-            CheckTpm(),
+            CheckTpm(profile),
             CheckMemoryIntegrity()
         };
 
@@ -61,7 +64,7 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
             FirmwareType.Bios => new FirmwareFinding("Modo de arranque", "Legacy / CSM")
             {
                 Severity = FindingSeverity.Warning,
-                Recommendation = "El arranque Legacy impide Secure Boot y, en Windows 11, no esta soportado. "
+                Recommendation = "El arranque Legacy impide Secure Boot y, en Windows 11, no está soportado. "
                                  + "Convertir el disco a GPT con mbr2gpt y cambiar la BIOS a UEFI es posible, "
                                  + "pero haz una copia de seguridad antes: si algo falla el equipo no arranca."
             },
@@ -73,7 +76,11 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
         };
     }
 
-    private static Finding CheckSecureBoot()
+    /// <summary>Donde esta el ajuste en la placa de este equipo, y como llegar.</summary>
+    private static string Where(HardwareProfile profile, BiosSetting setting)
+        => BiosMenuGuide.Directions(profile.Motherboard, profile.Cpu?.Name ?? string.Empty, setting);
+
+    private static Finding CheckSecureBoot(HardwareProfile profile)
     {
         var enabled = ReadDword(SecureBootStateKey, "UEFISecureBootEnabled");
 
@@ -87,9 +94,9 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
             0 => new FirmwareFinding("Secure Boot", "desactivado")
             {
                 Severity = FindingSeverity.Suggestion,
-                Recommendation = "Activalo en la BIOS (Boot o Security > Secure Boot). Es requisito de Windows 11 "
-                                 + "y algunos anticheats lo exigen. Si arrancas Linux en el mismo equipo, "
-                                 + "comprueba antes que tu distribucion lo soporta."
+                Recommendation = "Es requisito de Windows 11 y algunos anticheats lo exigen. Si arrancas Linux "
+                                 + "en el mismo equipo, comprueba antes que tu distribución lo soporta. "
+                                 + Where(profile, BiosSetting.SecureBoot)
             },
 
             _ => new FirmwareFinding("Secure Boot", "no disponible en este firmware")
@@ -106,12 +113,12 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
 
         if (enabledInFirmware is false)
         {
-            return new FirmwareFinding("Virtualizacion", "desactivada en la BIOS")
+            return new FirmwareFinding("Virtualización", "desactivada en la BIOS")
             {
                 Severity = FindingSeverity.Suggestion,
-                Recommendation = "Busca Intel VT-x / AMD-V (o SVM Mode) en la BIOS y activala. "
-                                 + "La necesitan WSL, las maquinas virtuales, los emuladores de Android "
-                                 + "y la proteccion de seguridad basada en virtualizacion."
+                Recommendation = "La necesitan WSL, las máquinas virtuales, los emuladores de Android "
+                                 + "y la protección de seguridad basada en virtualización. "
+                                 + Where(profile, BiosSetting.Virtualization)
             };
         }
 
@@ -119,10 +126,10 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
             ? "activada, con hipervisor en marcha"
             : "activada";
 
-        return new FirmwareFinding("Virtualizacion", state) { Severity = FindingSeverity.Info };
+        return new FirmwareFinding("Virtualización", state) { Severity = FindingSeverity.Info };
     }
 
-    private static Finding CheckTpm()
+    private static Finding CheckTpm(HardwareProfile profile)
     {
         foreach (var tpm in Wmi.Query(
                      "SELECT * FROM Win32_Tpm",
@@ -136,17 +143,17 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
 
                 if (enabled && activated)
                 {
-                    return new FirmwareFinding("TPM", $"activo, version {version}")
+                    return new FirmwareFinding("TPM", $"activo, versión {version}")
                     {
                         Severity = FindingSeverity.Info
                     };
                 }
 
-                return new FirmwareFinding("TPM", $"presente pero inactivo (version {version})")
+                return new FirmwareFinding("TPM", $"presente pero inactivo (versión {version})")
                 {
                     Severity = FindingSeverity.Suggestion,
-                    Recommendation = "Activalo en la BIOS. Suele aparecer como PTT (Intel) o fTPM (AMD). "
-                                     + "Windows 11 lo requiere y BitLocker lo usa."
+                    Recommendation = "Windows 11 lo requiere y BitLocker lo usa. "
+                                     + Where(profile, BiosSetting.Tpm)
                 };
             }
         }
@@ -154,8 +161,8 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
         return new FirmwareFinding("TPM", "no detectado")
         {
             Severity = FindingSeverity.Suggestion,
-            Recommendation = "Si la placa lo soporta, aparecera en la BIOS como PTT (Intel) o fTPM (AMD). "
-                             + "Sin TPM 2.0 este equipo no cumple los requisitos de Windows 11."
+            Recommendation = "Sin TPM 2.0 este equipo no cumple los requisitos de Windows 11. "
+                             + Where(profile, BiosSetting.Tpm)
         };
     }
 
@@ -168,7 +175,7 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
             return new FirmwareFinding("Integridad de memoria (HVCI)", "desactivada")
             {
                 Severity = FindingSeverity.Info,
-                Recommendation = "Esta desactivada, asi que no te esta costando rendimiento. "
+                Recommendation = "Está desactivada, así que no te está costando rendimiento. "
                                  + "Activarla en Seguridad de Windows endurece el sistema frente a drivers maliciosos."
             };
         }
@@ -176,9 +183,9 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
         return new FirmwareFinding("Integridad de memoria (HVCI)", "activada")
         {
             Severity = FindingSeverity.Info,
-            Recommendation = "Protege frente a drivers maliciosos, pero al apoyarse en virtualizacion "
-                             + "puede costar un pequeno porcentaje de rendimiento en juegos. "
-                             + "Es una decision tuya: seguridad frente a unos pocos fotogramas."
+            Recommendation = "Protege frente a drivers maliciosos, pero al apoyarse en virtualización "
+                             + "puede costar un pequeño porcentaje de rendimiento en juegos. "
+                             + "Es una decisión tuya: seguridad frente a unos pocos fotogramas."
         };
     }
 
@@ -209,10 +216,11 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
             $"la RAM va a {actual} MHz pudiendo ir a {nominal} MHz")
         {
             Severity = FindingSeverity.Warning,
-            Recommendation = "El perfil XMP (Intel) o EXPO/DOCP (AMD) no esta activado en la BIOS. "
+            Recommendation = "El perfil XMP (Intel) o EXPO/DOCP (AMD) no está activado en la BIOS. "
                              + "Activarlo es un solo ajuste y recupera la velocidad por la que pagaste; "
                              + "en juegos limitados por CPU la diferencia se nota. "
-                             + "Si el equipo se vuelve inestable, vuelve al perfil automatico."
+                             + "Si el equipo se vuelve inestable, vuelve al perfil automático. "
+                             + Where(profile, BiosSetting.MemoryProfile)
         };
     }
 

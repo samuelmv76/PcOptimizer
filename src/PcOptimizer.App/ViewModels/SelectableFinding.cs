@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using PcOptimizer.Core.Abstractions;
+using PcOptimizer.Core.Platform;
+using PcOptimizer.Core.Summary;
 
 namespace PcOptimizer.App.ViewModels;
 
@@ -20,22 +22,26 @@ public partial class SelectableFinding : ObservableObject
 
     public string Details => Model.Details;
 
-    public string Size => Model.ReclaimableBytes > 0
-        ? FormatBytes(Model.ReclaimableBytes)
-        : string.Empty;
+    public string Recommendation => Model.Recommendation;
 
-    public static string FormatBytes(long bytes)
-    {
-        string[] units = ["B", "KB", "MB", "GB", "TB"];
-        double value = bytes;
-        var unit = 0;
+    public bool HasRecommendation => !string.IsNullOrWhiteSpace(Model.Recommendation);
 
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
+    /// <summary>Si la ficha lleva a otro apartado (las del resumen).</summary>
+    public bool HasTarget => !string.IsNullOrEmpty(Model.RelatedModuleId);
 
-        return $"{value:0.##} {units[unit]}";
-    }
+    public string? RelatedModuleId => Model.RelatedModuleId;
+
+    /// <summary>Lo pendiente en el apartado, para las fichas del resumen.</summary>
+    public int PendingCount => (Model as SummaryFinding)?.PendingCount ?? 0;
+
+    /// <summary>Ficha de resumen sin nada que hacer: se pinta con una marca verde.</summary>
+    public bool IsClear => Model is SummaryFinding && PendingCount == 0 && Severity == FindingSeverity.Info;
+
+    public FindingSeverity Severity => Model.Severity;
+
+    public long ReclaimableBytes => Model.ReclaimableBytes;
+
+    public string Size => Model.DisplayBytes > 0 ? ByteSize.Format(Model.DisplayBytes) : string.Empty;
+
+    public static string FormatBytes(long bytes) => ByteSize.Format(bytes);
 }

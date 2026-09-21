@@ -12,5 +12,12 @@ public sealed class RemediationOptions
     /// <summary>Crear un punto de restauracion antes de aplicar cambios reales.</summary>
     public bool CreateRestorePoint { get; init; }
 
+    /// <summary>
+    /// Para un fichero que otro programa tiene abierto, pedir a Windows que
+    /// lo borre en el proximo arranque. Es la via que usan los instaladores;
+    /// requiere privilegios de administrador y no surte efecto hasta reiniciar.
+    /// </summary>
+    public bool DeleteLockedOnReboot { get; init; }
+
     public static RemediationOptions Preview { get; } = new() { Simulate = true };
 }

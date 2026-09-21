@@ -86,7 +86,7 @@ public sealed class PowerShellRunner : IPowerShellRunner
             // Una cancelacion pedida por el usuario se propaga; un planton del
             // proceso se devuelve como error para no tumbar el analisis entero.
             cancellationToken.ThrowIfCancellationRequested();
-            return new PowerShellResult(-1, string.Empty, "PowerShell no respondio a tiempo.");
+            return new PowerShellResult(-1, string.Empty, "PowerShell no respondió a tiempo.");
         }
 
         var output = await outputTask.ConfigureAwait(false);

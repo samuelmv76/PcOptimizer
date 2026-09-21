@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using PcOptimizer.Core.Abstractions;
 using PcOptimizer.Core.Auditing;
+using PcOptimizer.Core.Safety;
 
 namespace PcOptimizer.Core.Startup;
 
@@ -15,14 +16,24 @@ public sealed class StartupManager : IOptimizerModule
     private const string BackupKey = @"Software\PcOptimizer\DisabledStartup";
 
     private readonly IAuditLog _audit;
+    private readonly IChangeJournal _journal;
 
-    public StartupManager(IAuditLog? audit = null) => _audit = audit ?? NullAuditLog.Instance;
+    public StartupManager(IAuditLog? audit = null, IChangeJournal? journal = null)
+    {
+        _audit = audit ?? NullAuditLog.Instance;
+        _journal = journal ?? NullChangeJournal.Instance;
+    }
 
     public string Id => "startup.manager";
 
     public string DisplayName => "Programas al inicio";
 
+    public string Description =>
+        "Programas que arrancan con Windows. Desactivar no borra nada: la entrada se guarda en una clave de respaldo para poder restaurarla.";
+
     public bool RequiresElevation => true;
+
+    public bool BenefitsFromRestorePoint => true;
 
     public Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
@@ -53,6 +64,16 @@ public sealed class StartupManager : IOptimizerModule
                 if (!options.Simulate)
                 {
                     Disable(entry);
+
+                    _journal.Record(new ReversibleChange
+                    {
+                        ModuleId = Id,
+                        Kind = ChangeKinds.StartupEntry,
+                        Target = entry.Id,
+                        PreviousValue = entry.Command,
+                        NewValue = null,
+                        Description = $"Arranque desactivado: {entry.Name}"
+                    });
                 }
 
                 _audit.Record(Id, "disable-startup", entry.Id, options.Simulate);
@@ -61,6 +82,7 @@ public sealed class StartupManager : IOptimizerModule
             catch (Exception ex)
             {
                 failed++;
+                _audit.RecordFailure(Id, "disable-startup", entry.Id, ex.Message);
                 errors.Add($"{entry.Name}: {ex.Message}");
             }
         }
@@ -109,6 +131,78 @@ public sealed class StartupManager : IOptimizerModule
         }
     }
 
+    /// <summary>
+    /// Vuelve a activar una entrada desactivada por esta aplicacion. El
+    /// identificador es el mismo que se guardo en el diario de cambios:
+    /// "Ubicacion:Nombre".
+    /// </summary>
+    public static void Restore(string entryId, string command)
+    {
+        var separator = entryId.IndexOf(':');
+
+        if (separator <= 0
+            || !Enum.TryParse<StartupLocation>(entryId[..separator], out var location))
+        {
+            throw new InvalidOperationException($"Entrada de arranque no reconocida: {entryId}");
+        }
+
+        var name = entryId[(separator + 1)..];
+
+        switch (location)
+        {
+            case StartupLocation.CurrentUserRun:
+                RestoreRegistryEntry(Registry.CurrentUser, location, name, command);
+                break;
+
+            case StartupLocation.LocalMachineRun:
+                RestoreRegistryEntry(Registry.LocalMachine, location, name, command);
+                break;
+
+            case StartupLocation.StartupFolder:
+                RestoreShortcut(command);
+                break;
+
+            default:
+                throw new NotSupportedException($"Ubicación no soportada: {location}");
+        }
+    }
+
+    private static void RestoreRegistryEntry(RegistryKey root, StartupLocation location, string name, string command)
+    {
+        using var key = root.CreateSubKey(RunKey, writable: true)
+            ?? throw new InvalidOperationException("No se pudo abrir la clave Run para escritura.");
+
+        key.SetValue(name, command, RegistryValueKind.String);
+
+        using var backup = root.OpenSubKey($@"{BackupKey}\{location}", writable: true);
+        backup?.DeleteValue(name, throwOnMissingValue: false);
+    }
+
+    private static void RestoreShortcut(string originalPath)
+    {
+        var backupFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "PcOptimizer",
+            "DisabledStartup");
+
+        var backup = Path.Combine(backupFolder, Path.GetFileName(originalPath));
+
+        if (!File.Exists(backup))
+        {
+            throw new InvalidOperationException(
+                $"No se encuentra la copia de seguridad del acceso directo: {backup}");
+        }
+
+        var folder = Path.GetDirectoryName(originalPath);
+
+        if (!string.IsNullOrEmpty(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        File.Move(backup, originalPath, overwrite: true);
+    }
+
     private static void Disable(StartupEntry entry)
     {
         switch (entry.Location)
@@ -126,7 +220,7 @@ public sealed class StartupManager : IOptimizerModule
                 break;
 
             default:
-                throw new NotSupportedException($"Ubicacion no soportada: {entry.Location}");
+                throw new NotSupportedException($"Ubicación no soportada: {entry.Location}");
         }
     }
 

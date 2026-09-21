@@ -32,10 +32,22 @@ public abstract class Finding
     public long ReclaimableBytes { get; init; }
 
     /// <summary>
+    /// Tamano que muestra la interfaz. Por defecto es lo recuperable, pero un
+    /// hallazgo informativo puede ocupar mucho sin que la app libere nada.
+    /// </summary>
+    public virtual long DisplayBytes => ReclaimableBytes;
+
+    /// <summary>
     /// Que deberia hacer el usuario. Se usa sobre todo en modulos de
     /// diagnostico, donde la aplicacion no puede aplicar el cambio por si misma.
     /// </summary>
     public string Recommendation { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Apartado donde se actua sobre este hallazgo, si no es el que lo
+    /// produjo. Lo usa el resumen para que cada ficha lleve a su pagina.
+    /// </summary>
+    public string? RelatedModuleId { get; init; }
 
     /// <summary>
     /// Si la UI debe marcarlo por defecto. Solo true cuando la accion es

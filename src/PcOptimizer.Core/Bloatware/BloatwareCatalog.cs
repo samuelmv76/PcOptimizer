@@ -91,39 +91,39 @@ public static class BloatwareCatalog
         ["Microsoft.BingWeather"] = "El Tiempo de Bing",
         ["Microsoft.BingFinance"] = "Finanzas de Bing",
         ["Microsoft.BingSports"] = "Deportes de Bing",
-        ["Microsoft.BingSearch"] = "Busqueda web de Bing",
+        ["Microsoft.BingSearch"] = "Búsqueda web de Bing",
         ["Microsoft.GetHelp"] = "Asistencia de Microsoft",
         ["Microsoft.Getstarted"] = "Sugerencias de Windows",
         ["Microsoft.Messaging"] = "Mensajes, discontinuado",
         ["Microsoft.MicrosoftOfficeHub"] = "Acceso directo a Office",
         ["Microsoft.MicrosoftSolitaireCollection"] = "Solitario con anuncios",
-        ["Microsoft.MicrosoftStickyNotes"] = "Notas rapidas",
+        ["Microsoft.MicrosoftStickyNotes"] = "Notas rápidas",
         ["Microsoft.People"] = "Contactos, apenas integrado",
         ["Microsoft.SkypeApp"] = "Skype preinstalado",
         ["Microsoft.Todos"] = "Microsoft To Do",
         ["Microsoft.WindowsFeedbackHub"] = "Centro de opiniones",
         ["Microsoft.WindowsMaps"] = "Mapas de Windows",
-        ["Microsoft.YourPhone"] = "Movil vinculado",
+        ["Microsoft.YourPhone"] = "Móvil vinculado",
         ["Microsoft.ZuneMusic"] = "Reproductor multimedia de Microsoft",
-        ["Microsoft.ZuneVideo"] = "Peliculas y TV",
+        ["Microsoft.ZuneVideo"] = "Películas y TV",
         ["Microsoft.WindowsSoundRecorder"] = "Grabadora de voz",
-        ["Microsoft.WindowsCamera"] = "Camara",
+        ["Microsoft.WindowsCamera"] = "Cámara",
         ["Microsoft.WindowsAlarms"] = "Alarmas y reloj",
         ["Microsoft.OutlookForWindows"] = "Outlook nuevo, preinstalado",
         ["MicrosoftTeams"] = "Teams personal, preinstalado",
         ["MSTeams"] = "Teams, preinstalado",
         ["Microsoft.549981C3F5F10"] = "Cortana",
         ["Microsoft.Copilot"] = "Copilot",
-        ["Microsoft.XboxApp"] = "Xbox, version antigua descatalogada",
+        ["Microsoft.XboxApp"] = "Xbox, versión antigua descatalogada",
         ["Microsoft.Xbox.TCUI"] = "Interfaz de Xbox Live para apps antiguas",
-        ["Microsoft.XboxGameOverlay"] = "Superposicion de Xbox, version antigua",
-        ["Microsoft.XboxSpeechToTextOverlay"] = "Subtitulos de Xbox",
+        ["Microsoft.XboxGameOverlay"] = "Superposición de Xbox, versión antigua",
+        ["Microsoft.XboxSpeechToTextOverlay"] = "Subtítulos de Xbox",
         ["Microsoft.MicrosoftJournal"] = "Journal, app de notas a mano",
         ["Microsoft.PowerAutomateDesktop"] = "Power Automate preinstalado",
         ["Microsoft.Whiteboard"] = "Pizarra",
         ["Microsoft.Wallet"] = "Cartera, discontinuada",
         ["Microsoft.OneConnect"] = "Movistar/operadoras, discontinuado",
-        ["Microsoft.Print3D"] = "Impresion 3D, discontinuada",
+        ["Microsoft.Print3D"] = "Impresión 3D, discontinuada",
         ["Microsoft.NetworkSpeedTest"] = "Test de velocidad",
         ["Microsoft.Advertising.Xaml"] = "Biblioteca de anuncios"
     };
@@ -148,13 +148,13 @@ public static class BloatwareCatalog
     /// </summary>
     private static readonly Dictionary<string, string> RemoveWithCare = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Microsoft.XboxGamingOverlay"] = "Es la Game Bar (Win+G): grabacion, captura y widget de FPS. "
-                                          + "Quitala solo si no la usas; algunos juegos la necesitan para "
-                                          + "la superposicion de Game Pass.",
-        ["Microsoft.XboxIdentityProvider"] = "Necesaria para iniciar sesion con cuenta Xbox. "
+        ["Microsoft.XboxGamingOverlay"] = "Es la Game Bar (Win+G): grabación, captura y widget de FPS. "
+                                          + "Quítala solo si no la usas; algunos juegos la necesitan para "
+                                          + "la superposición de Game Pass.",
+        ["Microsoft.XboxIdentityProvider"] = "Necesaria para iniciar sesión con cuenta Xbox. "
                                              + "Sin ella, varios juegos con Xbox Live no arrancan.",
-        ["Microsoft.GamingApp"] = "Es la app Xbox / Game Pass. Quitala solo si no juegas con Game Pass.",
-        ["Microsoft.WindowsTerminal"] = "Terminal de Windows. No es basura: solo quitala si no la usas."
+        ["Microsoft.GamingApp"] = "Es la app Xbox / Game Pass. Quítala solo si no juegas con Game Pass.",
+        ["Microsoft.WindowsTerminal"] = "Terminal de Windows. No es basura: solo quítala si no la usas."
     };
 
     public static AppClassification Classify(string packageName)

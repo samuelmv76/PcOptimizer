@@ -16,13 +16,26 @@ public sealed class HardwareInventory : DiagnosticModule
     private const string DisplayClassKey =
         @"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}";
 
-    public override string Id => "hardware.inventory";
+    public const string ModuleId = "hardware.inventory";
+
+    private readonly HardwareProfileCache? _cache;
+
+    /// <param name="cache">
+    /// Si se da, analizar desde esta pagina refresca la lectura compartida, y
+    /// el resto de modulos ven el hardware actualizado sin volver a leerlo.
+    /// </param>
+    public HardwareInventory(HardwareProfileCache? cache = null) => _cache = cache;
+
+    public override string Id => ModuleId;
 
     public override string DisplayName => "Hardware del equipo";
 
+    public override string Description =>
+        "Qué hay dentro del PC: procesador, gráfica, memoria y discos. Solo lectura.";
+
     public override Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
-        var profile = Capture(cancellationToken);
+        var profile = _cache?.Refresh() ?? Capture(cancellationToken);
         return Task.FromResult(Describe(profile));
     }
 
@@ -41,6 +54,7 @@ public sealed class HardwareInventory : DiagnosticModule
             MemoryModules = ReadMemory(),
             Disks = ReadDisks(),
             Os = ReadOs(),
+            IsPortable = ReadHasBattery(),
             Motherboard = ReadMotherboard(),
             BiosVersion = ReadBios(out var biosDate),
             BiosDate = biosDate
@@ -56,7 +70,7 @@ public sealed class HardwareInventory : DiagnosticModule
             findings.Add(new HardwareFinding(
                 "Procesador",
                 cpu.Name,
-                $"{cpu.PhysicalCores} nucleos / {cpu.LogicalCores} hilos, {cpu.MaxClockMhz} MHz nominales"));
+                $"{cpu.PhysicalCores} núcleos / {cpu.LogicalCores} hilos, {cpu.MaxClockMhz} MHz nominales"));
         }
 
         foreach (var gpu in profile.Gpus)
@@ -76,11 +90,11 @@ public sealed class HardwareInventory : DiagnosticModule
             var driverIsOld = gpu.DriverDate is { } issued
                               && DateTime.Now - issued > TimeSpan.FromDays(365);
 
-            findings.Add(new HardwareFinding("Grafica", gpu.Name, $"{memory}{driver}{driverAge}")
+            findings.Add(new HardwareFinding("Gráfica", gpu.Name, $"{memory}{driver}{driverAge}")
             {
                 Severity = driverIsOld ? FindingSeverity.Suggestion : FindingSeverity.Info,
                 Recommendation = driverIsOld
-                    ? "El driver tiene mas de un ano. Actualizarlo suele dar rendimiento "
+                    ? "El driver tiene más de un año. Actualizarlo suele dar rendimiento "
                       + "y corregir fallos en juegos recientes."
                     : string.Empty
             });
@@ -102,18 +116,18 @@ public sealed class HardwareInventory : DiagnosticModule
             findings.Add(new HardwareFinding(
                 "Memoria",
                 $"{total} de RAM",
-                $"{profile.MemoryModules.Count} modulos a {speedText}"));
+                $"{profile.MemoryModules.Count} módulos a {speedText}"));
 
             if (profile.MemoryModules.Count == 1)
             {
                 findings.Add(new HardwareFinding(
                     "Memoria",
-                    "Un solo modulo de RAM",
+                    "Un solo módulo de RAM",
                     "La memoria trabaja en canal simple.")
                 {
                     Severity = FindingSeverity.Suggestion,
-                    Recommendation = "Anadir un segundo modulo igual habilita el doble canal. "
-                                     + "En juegos con grafica integrada la diferencia es grande."
+                    Recommendation = "Añadir un segundo módulo igual habilita el doble canal. "
+                                     + "En juegos con gráfica integrada la diferencia es grande."
                 });
             }
         }
@@ -130,12 +144,12 @@ public sealed class HardwareInventory : DiagnosticModule
             {
                 findings.Add(new HardwareFinding(
                     "Almacenamiento",
-                    "Windows esta instalado en un disco mecanico",
+                    "Windows está instalado en un disco mecánico",
                     "El disco del sistema es un HDD.")
                 {
                     Severity = FindingSeverity.Warning,
                     Recommendation = "Pasar Windows a un SSD es, con diferencia, la mejora de rendimiento "
-                                     + "mas grande que puedes hacer en este equipo."
+                                     + "más grande que puedes hacer en este equipo."
                 });
             }
         }
@@ -146,7 +160,7 @@ public sealed class HardwareInventory : DiagnosticModule
             findings.Add(new HardwareFinding(
                 "Sistema",
                 os.Caption,
-                $"Version {os.Version} (build {os.Build}), {os.Architecture}{installed}"));
+                $"Versión {os.Version} (build {os.Build}), {os.Architecture}{installed}"));
         }
 
         if (!string.IsNullOrEmpty(profile.Motherboard))
@@ -354,6 +368,20 @@ public sealed class HardwareInventory : DiagnosticModule
         }
 
         return null;
+    }
+
+    /// <summary>Con bateria se asume portatil. Basta para ajustar consejos.</summary>
+    private static bool ReadHasBattery()
+    {
+        foreach (var battery in Wmi.Query("SELECT DeviceID FROM Win32_Battery"))
+        {
+            using (battery)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static string ReadMotherboard()

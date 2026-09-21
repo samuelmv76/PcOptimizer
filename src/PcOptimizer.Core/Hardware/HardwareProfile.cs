@@ -71,6 +71,12 @@ public sealed record HardwareProfile
 
     public OsInfo? Os { get; init; }
 
+    /// <summary>
+    /// Si el equipo lleva bateria. Cambia las recomendaciones: en un portatil
+    /// el plan de alto rendimiento se come la autonomia y calienta.
+    /// </summary>
+    public bool IsPortable { get; init; }
+
     public string Motherboard { get; init; } = string.Empty;
 
     public string BiosVersion { get; init; } = string.Empty;
@@ -78,6 +84,15 @@ public sealed record HardwareProfile
     public DateTime? BiosDate { get; init; }
 
     public long TotalMemoryBytes => MemoryModules.Sum(m => m.CapacityBytes);
+
+    /// <summary>
+    /// Equipo modesto: disco del sistema mecanico, menos de 8 GB de RAM o
+    /// grafica integrada. Es donde los ajustes visuales si se notan.
+    /// </summary>
+    public bool IsModestHardware =>
+        Disks.Any(d => d.IsSystemDisk && d.MediaType.Equals("HDD", StringComparison.OrdinalIgnoreCase))
+        || (TotalMemoryBytes > 0 && TotalMemoryBytes < 8L * 1024 * 1024 * 1024)
+        || (PrimaryGpu is { } gpu && gpu.IsLikelyIntegrated);
 
     public GpuInfo? PrimaryGpu =>
         Gpus.FirstOrDefault(g => !g.IsLikelyIntegrated) ?? Gpus.FirstOrDefault();

@@ -7,10 +7,19 @@
     <RootNamespace>PcOptimizer.App</RootNamespace>
     <AssemblyName>PcOptimizer</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <!-- El .ico lleva un dibujo distinto por tamano (a 16 px no caben las
+       patillas del chip). El .svg es la fuente de la que salen los demas. -->
+  <ItemGroup>
+    <Resource Include="Assets\AppIcon.ico" />
+    <Resource Include="Assets\AppIcon.png" />
+    <None Include="Assets\AppIcon.svg" />
   </ItemGroup>
 
   <ItemGroup>

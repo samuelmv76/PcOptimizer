@@ -5,6 +5,14 @@
     <RootNamespace>PcOptimizer.Core</RootNamespace>
   </PropertyGroup>
 
+  <!-- Los tests comprueban la clasificacion de paquetes y el escapado de
+       argumentos, que son internos a proposito: no forman parte de la API. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>PcOptimizer.Core.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Management" Version="9.0.0" />
   </ItemGroup>

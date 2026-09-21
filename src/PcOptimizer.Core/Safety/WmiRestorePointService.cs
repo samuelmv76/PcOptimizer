@@ -26,7 +26,7 @@ public sealed class WmiRestorePointService : IRestorePointService
 
             if (returnValue != 0)
             {
-                error = $"CreateRestorePoint devolvio el codigo {returnValue}.";
+                error = $"CreateRestorePoint devolvió el código {returnValue}.";
                 return false;
             }
 

@@ -3,39 +3,67 @@ using System.Management;
 namespace PcOptimizer.Core.Platform;
 
 /// <summary>
-/// Envoltura minima sobre WMI. Centraliza el manejo de errores: una consulta
-/// que falla devuelve una secuencia vacia en vez de tumbar el analisis, porque
-/// hay equipos donde ciertas clases no existen o el servicio esta capado.
+/// Envoltura minima sobre WMI. Centraliza el manejo de errores: hay equipos
+/// donde una clase no existe, el servicio esta capado o la enumeracion falla
+/// a mitad. Nada de eso debe tumbar un analisis, asi que aqui se traduce en
+/// una secuencia vacia o mas corta.
 /// </summary>
 public static class Wmi
 {
     public static IEnumerable<ManagementObject> Query(string query, string scope = "root\\CIMV2")
     {
-        ManagementObjectCollection results;
+        ManagementObjectSearcher? searcher = null;
+        ManagementObjectCollection? results = null;
 
         try
         {
-            using var searcher = new ManagementObjectSearcher(scope, query);
+            searcher = new ManagementObjectSearcher(scope, query);
             results = searcher.Get();
         }
-        catch (ManagementException)
+        catch (Exception ex) when (IsTolerable(ex))
         {
-            yield break;
+            results = null;
         }
-        catch (UnauthorizedAccessException)
+
+        if (results is null)
         {
+            searcher?.Dispose();
             yield break;
         }
 
-        using (results)
+        try
         {
-            foreach (var item in results)
+            // Get() es perezoso: el error real suele aparecer aqui, no arriba.
+            var enumerator = results.GetEnumerator();
+
+            while (true)
             {
-                if (item is ManagementObject managementObject)
+                object? current;
+
+                try
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        break;
+                    }
+
+                    current = enumerator.Current;
+                }
+                catch (Exception ex) when (IsTolerable(ex))
+                {
+                    break;
+                }
+
+                if (current is ManagementObject managementObject)
                 {
                     yield return managementObject;
                 }
             }
+        }
+        finally
+        {
+            results.Dispose();
+            searcher?.Dispose();
         }
     }
 
@@ -45,7 +73,7 @@ public static class Wmi
         {
             return source[property]?.ToString()?.Trim() ?? string.Empty;
         }
-        catch (ManagementException)
+        catch (Exception ex) when (IsTolerable(ex))
         {
             return string.Empty;
         }
@@ -58,7 +86,7 @@ public static class Wmi
             var value = source[property];
             return value is null ? 0 : Convert.ToUInt64(value);
         }
-        catch (Exception ex) when (ex is ManagementException or InvalidCastException or FormatException or OverflowException)
+        catch (Exception ex) when (IsTolerable(ex) || ex is InvalidCastException or FormatException or OverflowException)
         {
             return 0;
         }
@@ -73,9 +101,15 @@ public static class Wmi
         {
             return source[property] as bool?;
         }
-        catch (ManagementException)
+        catch (Exception ex) when (IsTolerable(ex))
         {
             return null;
         }
     }
+
+    private static bool IsTolerable(Exception ex) =>
+        ex is ManagementException
+            or UnauthorizedAccessException
+            or System.Runtime.InteropServices.COMException
+            or NotSupportedException;
 }

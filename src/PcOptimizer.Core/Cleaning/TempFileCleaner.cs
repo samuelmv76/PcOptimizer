@@ -26,9 +26,14 @@ public sealed class TempFileCleaner : IOptimizerModule
 
     public string Id => "cleaning.temp";
 
-    public string DisplayName => "Limpieza de temporales y cache";
+    public string DisplayName => "Limpieza de temporales y caché";
+
+    public string Description =>
+        "Borra ficheros temporales con más de 24 horas de un conjunto cerrado de carpetas del sistema. Nunca entra en Documentos ni en Descargas.";
 
     public bool RequiresElevation => true;
+
+    public bool SupportsRebootDeletion => true;
 
     public static IReadOnlyList<CleaningTarget> DefaultTargets()
     {
@@ -39,7 +44,7 @@ public sealed class TempFileCleaner : IOptimizerModule
         {
             new("Temporales del usuario", Path.GetTempPath()),
             new("Temporales de Windows", Path.Combine(windows, "Temp")),
-            new("Cache de Internet", Path.Combine(local, "Microsoft", "Windows", "INetCache")),
+            new("Caché de Internet", Path.Combine(local, "Microsoft", "Windows", "INetCache")),
             new("Volcados de fallos", Path.Combine(local, "CrashDumps")),
             new("Informes de error de Windows", Path.Combine(local, "Microsoft", "Windows", "WER"))
         };
@@ -92,27 +97,47 @@ public sealed class TempFileCleaner : IOptimizerModule
         var errors = new List<string>();
         var applied = 0;
         var failed = 0;
+        var deferred = 0;
         long freed = 0;
 
         foreach (var finding in findings.OfType<FileFinding>())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            try
+            // Entre el analisis y el borrado pueden pasar minutos: un temporal
+            // que ya no esta no es un fallo, simplemente ya no hay nada que hacer.
+            if (!File.Exists(finding.FullPath))
             {
-                if (!options.Simulate)
-                {
-                    File.Delete(finding.FullPath);
-                }
+                continue;
+            }
 
-                _audit.Record(Id, "delete-file", finding.FullPath, options.Simulate);
+            if (options.Simulate)
+            {
+                _audit.Record(Id, "delete-file", finding.FullPath, simulated: true);
+                applied++;
+                freed += finding.ReclaimableBytes;
+                continue;
+            }
+
+            if (FileDeletion.TryDelete(finding.FullPath, out var error))
+            {
+                _audit.Record(Id, "delete-file", finding.FullPath, simulated: false);
                 applied++;
                 freed += finding.ReclaimableBytes;
             }
-            catch (Exception ex)
+            else if (options.DeleteLockedOnReboot
+                     && FileDeletion.IsInUse(error)
+                     && FileDeletion.TryScheduleDeleteOnReboot(finding.FullPath, out _))
+            {
+                _audit.Record(Id, "delete-file-on-reboot", finding.FullPath, simulated: false);
+                deferred++;
+                errors.Add($"{Path.GetFileName(finding.FullPath)}: en uso, se borrará al reiniciar.");
+            }
+            else
             {
                 failed++;
-                errors.Add($"{finding.FullPath}: {ex.Message}");
+                _audit.RecordFailure(Id, "delete-file", finding.FullPath, error ?? "motivo desconocido");
+                errors.Add($"{Path.GetFileName(finding.FullPath)}: {error}");
             }
         }
 
@@ -121,6 +146,7 @@ public sealed class TempFileCleaner : IOptimizerModule
             Simulated = options.Simulate,
             Applied = applied,
             Failed = failed,
+            Deferred = deferred,
             BytesFreed = freed,
             Errors = errors
         });
