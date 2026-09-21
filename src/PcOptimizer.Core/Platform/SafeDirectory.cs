@@ -23,17 +23,7 @@ public static class SafeDirectory
 
             var current = pending.Pop();
 
-            string[] files;
-            try
-            {
-                files = Directory.GetFiles(current, pattern);
-            }
-            catch (Exception ex) when (IsTolerable(ex))
-            {
-                continue;
-            }
-
-            foreach (var file in files)
+            foreach (var file in TryGetFiles(current, pattern))
             {
                 yield return file;
             }
@@ -43,9 +33,14 @@ public static class SafeDirectory
                 continue;
             }
 
-            foreach (var directory in GetAccessibleDirectories(current))
+            foreach (var directory in TryGetDirectories(current))
             {
-                pending.Push(directory);
+                // Las uniones y enlaces simbolicos pueden crear ciclos o sacarnos
+                // de la carpeta objetivo. No se siguen.
+                if (!IsReparsePoint(directory))
+                {
+                    pending.Push(directory);
+                }
             }
         }
     }
@@ -75,41 +70,50 @@ public static class SafeDirectory
         return total;
     }
 
-    private static IEnumerable<string> GetAccessibleDirectories(string parent)
+    /// <summary>Subcarpetas directas, sin fallar si la carpeta esta protegida.</summary>
+    public static IReadOnlyList<string> EnumerateTopLevelDirectories(string path)
+        => TryGetDirectories(path);
+
+    private static string[] TryGetFiles(string path, string pattern)
     {
-        string[] directories;
         try
         {
-            directories = Directory.GetDirectories(parent);
+            return Directory.GetFiles(path, pattern);
         }
         catch (Exception ex) when (IsTolerable(ex))
         {
-            yield break;
+            return [];
         }
+    }
 
-        foreach (var directory in directories)
+    private static string[] TryGetDirectories(string path)
+    {
+        try
         {
-            // Las uniones y enlaces simbolicos pueden crear ciclos o sacarnos
-            // de la carpeta objetivo. No se siguen.
-            bool isReparsePoint;
-            try
-            {
-                isReparsePoint = File.GetAttributes(directory).HasFlag(FileAttributes.ReparsePoint);
-            }
-            catch (Exception ex) when (IsTolerable(ex))
-            {
-                continue;
-            }
+            return Directory.GetDirectories(path);
+        }
+        catch (Exception ex) when (IsTolerable(ex))
+        {
+            return [];
+        }
+    }
 
-            if (!isReparsePoint)
-            {
-                yield return directory;
-            }
+    private static bool IsReparsePoint(string path)
+    {
+        try
+        {
+            return File.GetAttributes(path).HasFlag(FileAttributes.ReparsePoint);
+        }
+        catch (Exception ex) when (IsTolerable(ex))
+        {
+            // Si no se puede ni leer el atributo, tampoco se va a poder recorrer.
+            return true;
         }
     }
 
     public static bool IsTolerable(Exception ex) =>
         ex is UnauthorizedAccessException
             or IOException
-            or System.Security.SecurityException;
+            or System.Security.SecurityException
+            or ArgumentException;
 }

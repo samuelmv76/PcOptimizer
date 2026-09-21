@@ -10,6 +10,8 @@ public abstract class DiagnosticModule : IOptimizerModule
 
     public abstract string DisplayName { get; }
 
+    public virtual string Description => string.Empty;
+
     public virtual bool RequiresElevation => false;
 
     public ModuleKind Kind => ModuleKind.Diagnostic;

@@ -22,7 +22,12 @@ public sealed class StartupManager : IOptimizerModule
 
     public string DisplayName => "Programas al inicio";
 
+    public string Description =>
+        "Programas que arrancan con Windows. Desactivar no borra nada: la entrada se guarda en una clave de respaldo para poder restaurarla.";
+
     public bool RequiresElevation => true;
+
+    public bool BenefitsFromRestorePoint => true;
 
     public Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
@@ -61,6 +66,7 @@ public sealed class StartupManager : IOptimizerModule
             catch (Exception ex)
             {
                 failed++;
+                _audit.RecordFailure(Id, "disable-startup", entry.Id, ex.Message);
                 errors.Add($"{entry.Name}: {ex.Message}");
             }
         }

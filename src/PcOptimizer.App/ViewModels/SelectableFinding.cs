@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using PcOptimizer.Core.Abstractions;
+using PcOptimizer.Core.Platform;
 
 namespace PcOptimizer.App.ViewModels;
 
@@ -20,22 +21,15 @@ public partial class SelectableFinding : ObservableObject
 
     public string Details => Model.Details;
 
-    public string Size => Model.ReclaimableBytes > 0
-        ? FormatBytes(Model.ReclaimableBytes)
-        : string.Empty;
+    public string Recommendation => Model.Recommendation;
 
-    public static string FormatBytes(long bytes)
-    {
-        string[] units = ["B", "KB", "MB", "GB", "TB"];
-        double value = bytes;
-        var unit = 0;
+    public bool HasRecommendation => !string.IsNullOrWhiteSpace(Model.Recommendation);
 
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
+    public FindingSeverity Severity => Model.Severity;
 
-        return $"{value:0.##} {units[unit]}";
-    }
+    public long ReclaimableBytes => Model.ReclaimableBytes;
+
+    public string Size => Model.DisplayBytes > 0 ? ByteSize.Format(Model.DisplayBytes) : string.Empty;
+
+    public static string FormatBytes(long bytes) => ByteSize.Format(bytes);
 }

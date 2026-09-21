@@ -32,6 +32,12 @@ public abstract class Finding
     public long ReclaimableBytes { get; init; }
 
     /// <summary>
+    /// Tamano que muestra la interfaz. Por defecto es lo recuperable, pero un
+    /// hallazgo informativo puede ocupar mucho sin que la app libere nada.
+    /// </summary>
+    public virtual long DisplayBytes => ReclaimableBytes;
+
+    /// <summary>
     /// Que deberia hacer el usuario. Se usa sobre todo en modulos de
     /// diagnostico, donde la aplicacion no puede aplicar el cambio por si misma.
     /// </summary>

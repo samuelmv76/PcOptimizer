@@ -7,4 +7,8 @@ public sealed class NullAuditLog : IAuditLog
     public void Record(string module, string action, string target, bool simulated)
     {
     }
+
+    public void RecordFailure(string module, string action, string target, string reason)
+    {
+    }
 }

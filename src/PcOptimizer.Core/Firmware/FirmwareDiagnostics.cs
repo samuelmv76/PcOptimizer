@@ -26,6 +26,9 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
 
     public override string DisplayName => "Firmware y BIOS";
 
+    public override string Description =>
+        "Ajustes de firmware que afectan al rendimiento y a la compatibilidad. Esta aplicacion no escribe en la BIOS: te dice que cambiar y donde.";
+
     public override Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

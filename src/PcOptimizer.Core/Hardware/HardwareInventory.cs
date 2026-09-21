@@ -20,6 +20,9 @@ public sealed class HardwareInventory : DiagnosticModule
 
     public override string DisplayName => "Hardware del equipo";
 
+    public override string Description =>
+        "Que hay dentro del PC: procesador, grafica, memoria y discos. Solo lectura.";
+
     public override Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
         var profile = Capture(cancellationToken);

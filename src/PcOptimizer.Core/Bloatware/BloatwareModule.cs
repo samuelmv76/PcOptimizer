@@ -41,7 +41,12 @@ public sealed class BloatwareModule : IOptimizerModule
 
     public string DisplayName => "Aplicaciones preinstaladas";
 
+    public string Description =>
+        "Aplicaciones que vinieron con el equipo o con Windows. Las piezas del sistema no aparecen aqui: no se ofrecen para desinstalar.";
+
     public bool RequiresElevation => false;
+
+    public bool BenefitsFromRestorePoint => true;
 
     public async Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {
@@ -151,8 +156,10 @@ public sealed class BloatwareModule : IOptimizerModule
             }
             else
             {
+                var reason = Summarize(result.Error);
                 failed++;
-                errors.Add($"{finding.Title}: {Summarize(result.Error)}");
+                _audit.RecordFailure(Id, "remove-appx", finding.Package.PackageFullName, reason);
+                errors.Add($"{finding.Title}: {reason}");
             }
         }
 
