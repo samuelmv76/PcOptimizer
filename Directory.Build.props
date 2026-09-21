@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Company>PcOptimizer</Company>
+	</PropertyGroup>
+</Project>

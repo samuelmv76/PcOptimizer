@@ -1,0 +1,50 @@
+<Window x:Class="PcOptimizer.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PC Optimizer" Height="640" Width="980"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+
+        <Border DockPanel.Dock="Top" Padding="16" Background="#F3F3F3">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="260"
+                              ItemsSource="{Binding Modules}"
+                              SelectedItem="{Binding SelectedModule}"
+                              DisplayMemberPath="DisplayName"
+                              Margin="0,0,12,0" />
+                    <Button Content="Analizar" Command="{Binding ScanCommand}" />
+                    <Button Content="Simular" Command="{Binding SimulateCommand}" />
+                    <Button Content="Aplicar" Command="{Binding ApplyCommand}" />
+                </StackPanel>
+                <CheckBox Content="Crear punto de restauracion antes de aplicar"
+                          IsChecked="{Binding CreateRestorePoint}"
+                          Margin="0,12,0,0" />
+            </StackPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Padding="16,10" Background="#F3F3F3">
+            <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        </Border>
+
+        <DataGrid ItemsSource="{Binding Findings}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column"
+                  IsReadOnly="False">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="" Width="40"
+                                        Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
+                <DataGridTextColumn Header="Elemento" Width="280"
+                                    Binding="{Binding Title}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Detalles" Width="*"
+                                    Binding="{Binding Details}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Tamano" Width="110"
+                                    Binding="{Binding Size}" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </DockPanel>
+</Window>
