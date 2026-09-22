@@ -4,12 +4,16 @@ using PcOptimizer.Core.Cleaning;
 using PcOptimizer.Core.Disk;
 using PcOptimizer.Core.Firmware;
 using PcOptimizer.Core.Hardware;
+<<<<<<< HEAD
 using PcOptimizer.Core.Performance;
 using PcOptimizer.Core.Programs;
 using PcOptimizer.Core.Services;
 using PcOptimizer.Core.Startup;
 using PcOptimizer.Core.Summary;
 using PcOptimizer.Core.Undo;
+=======
+using PcOptimizer.Core.Startup;
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 using Xunit;
 
 namespace PcOptimizer.Core.Tests;
@@ -22,6 +26,7 @@ public sealed class ModuleContractTests
 {
     private static IReadOnlyList<IOptimizerModule> AllModules() =>
     [
+<<<<<<< HEAD
         new SummaryModule([], () => new HardwareProfile()),
         new HardwareInventory(),
         new GamingPerformanceModule(),
@@ -34,6 +39,14 @@ public sealed class ModuleContractTests
         new FirmwareDiagnostics(),
         new FirmwareSettingsModule(),
         new UndoModule()
+=======
+        new HardwareInventory(),
+        new TempFileCleaner(TempFileCleaner.DefaultTargets()),
+        new DiskSpaceAnalyzer(),
+        new BloatwareModule(),
+        new StartupManager(),
+        new FirmwareDiagnostics()
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     ];
 
     [Fact]
@@ -79,6 +92,7 @@ public sealed class ModuleContractTests
     }
 
     [Fact]
+<<<<<<< HEAD
     public void Todo_modulo_nombra_su_accion()
     {
         foreach (var module in AllModules())
@@ -99,6 +113,8 @@ public sealed class ModuleContractTests
     }
 
     [Fact]
+=======
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     public void Simular_es_el_valor_por_defecto()
         => Assert.True(new RemediationOptions().Simulate);
 

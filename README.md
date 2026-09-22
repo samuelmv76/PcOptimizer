@@ -6,6 +6,7 @@ espacio o ralentizando el arranque y deja que **tu** decidas que hacer.
 ## Que hace
 
 La aplicacion esta dividida en apartados. Cada uno analiza primero y no toca
+<<<<<<< HEAD
 nada hasta que tu lo pides. El analisis de cada apartado se conserva al
 cambiar de pagina, con la hora a la que se hizo.
 
@@ -15,12 +16,16 @@ apareciendo segun termina cada apartado, y mientras tanto se puede navegar
 libremente. Cada ficha dice cuanto hay pendiente y que es lo primero, y lleva a
 su apartado con los resultados ya cargados. No cambia nada: es para saber por
 donde empezar.
+=======
+nada hasta que tu lo pides.
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
 **Hardware del equipo** (solo lectura). Procesador, grafica con su VRAM real y
 la fecha de su driver, modulos de RAM, discos con su tipo (SSD o mecanico) y
 version de Windows. Es la base del resto: sin saber que hay dentro no se puede
 recomendar nada concreto.
 
+<<<<<<< HEAD
 **Rendimiento en juegos.** Modo Juego, grabacion en segundo plano, efectos
 visuales, transparencia, planificacion acelerada por GPU y plan de energia.
 Cada ajuste se recomienda o no **segun el hardware detectado**: bajar los
@@ -28,6 +33,8 @@ efectos visuales tiene sentido en un portatil con grafica integrada y no lo
 tiene en una torre con una 4070. El apartado tambien dice cuando el cuello de
 botella es el hardware y ningun ajuste lo va a arreglar.
 
+=======
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 **Limpieza de temporales y cache.** Ficheros con mas de 24 horas en un conjunto
 cerrado de carpetas del sistema. Nunca entra en Documentos ni en Descargas. Un
 fichero de solo lectura, oculto o de sistema se borra igual; uno que otro
@@ -44,6 +51,7 @@ aparece solo como informacion, con las instrucciones para hacerlo tu.
 Windows. Las piezas del sistema no se listan siquiera, y hay una segunda
 comprobacion antes de desinstalar por si la interfaz se equivoca.
 
+<<<<<<< HEAD
 **Programas instalados.** Los programas de escritorio clasicos, que es donde
 vive el bloatware del fabricante: antivirus de prueba, paneles de HP o Lenovo,
 juegos con publicidad. Los drivers y runtimes no se listan siquiera. Cuando el
@@ -58,10 +66,16 @@ gente no usa. Lo maximo que hace la aplicacion es pasarlos a inicio **Manual**:
 nunca los desactiva ni los para, asi que si algo los necesita Windows puede
 levantarlos.
 
+=======
+**Programas al inicio.** Registro y carpeta Inicio. Desactivar no borra: la
+entrada se copia a una clave de respaldo propia.
+
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 **Firmware y BIOS** (solo lectura). Modo de arranque UEFI o Legacy, Secure Boot,
 virtualizacion, TPM, integridad de memoria y si la RAM esta funcionando por
 debajo de su velocidad nominal (XMP/EXPO sin activar). De cada cosa te dice que
 cambiar y donde.
+<<<<<<< HEAD
 
 **Deshacer cambios.** Todo lo que la aplicacion cambia queda anotado con su
 valor anterior en `%LOCALAPPDATA%\PcOptimizer\changes.jsonl`. Desde este
@@ -83,11 +97,14 @@ de la barra lateral salen de Segoe Fluent Icons, que ya trae Windows.
 El icono de la aplicacion esta en `src/PcOptimizer.App/Assets/`: el `.svg` es
 la fuente, y el `.ico` lleva un dibujo simplificado para 16-20 px (sin las
 patillas del chip, que a ese tamano solo serian ruido).
+=======
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
 ## Que NO hace, a proposito
 
 - **No limpia el registro.** No hay evidencia de que mejore el rendimiento y si
   de que rompe instalaciones.
+<<<<<<< HEAD
 - **No escribe la configuracion propia de la placa.** XMP, virtualizacion o
   Secure Boot se guardan en un bloque cuyo formato cambia con cada placa y
   version de BIOS; escribirlo a ciegas desde Windows puede dejar el equipo sin
@@ -103,6 +120,14 @@ patillas del chip, que a ese tamano solo serian ruido).
 - **No incluye ajustes de foro sin evidencia.** El catalogo de rendimiento es
   corto a proposito: cada entrada tiene que hacer algo medible. Si un ajuste
   da resultados dispares, se dice y no viene marcado.
+=======
+- **No modifica la BIOS.** Escribir en el firmware requiere un driver en modo
+  kernel y puede dejar el equipo inarrancable. El modulo de firmware solo lee
+  y te dice que cambiar tu mismo.
+- **No borra Windows.old ni WinSxS por su cuenta.** Hacerlo a mano falla por
+  permisos y deja restos. La aplicacion te ensena cuanto ocupan y cual es la
+  forma correcta de quitarlos.
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 - **No desinstala piezas del sistema.** La Tienda, Defender, los runtimes y los
   servicios que necesitan los juegos estan en una lista de exclusion explicita.
 - **No promete porcentajes de mejora.** Si una herramienta te dice que tu PC
@@ -150,6 +175,7 @@ que tocan `HKLM` y `C:\Windows\Temp` fallaran con acceso denegado.
 ```
 src/PcOptimizer.Core/    logica, sin UI
   Abstractions/          IOptimizerModule, Finding, ModuleKind, RemediationOptions
+<<<<<<< HEAD
   Platform/              WMI, registro, PowerShell, planes de energia, borrado de ficheros
   Hardware/              inventario del equipo y lectura compartida del perfil
   Summary/               pagina de resumen
@@ -163,15 +189,30 @@ src/PcOptimizer.Core/    logica, sin UI
   Firmware/              diagnostico de BIOS
   Safety/                puntos de restauracion y diario de cambios
   Undo/                  vuelta atras
+=======
+  Platform/              WMI, PowerShell, recorrido seguro de carpetas, tamanos
+  Hardware/              inventario del equipo
+  Cleaning/              limpieza de temporales
+  Disk/                  analisis de espacio
+  Bloatware/             aplicaciones preinstaladas
+  Startup/               programas al inicio
+  Firmware/              diagnostico de BIOS
+  Safety/                puntos de restauracion
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
   Auditing/              log de cambios
   Configuration/         preferencias de la aplicacion
 src/PcOptimizer.App/     WPF
+<<<<<<< HEAD
   Themes/                paletas oscura y clara, y plantillas de controles
   Theming/               cambio de tema en vivo y barra de titulo
   Assets/                icono
   ViewModels/            estado de la interfaz y ajustes
   Converters/            severidad, iconos de apartado, visibilidad
   Services/              dialogos de confirmacion
+=======
+  ViewModels/            estado de la interfaz
+  Converters/            severidad a color y etiqueta
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 tests/                   xUnit
 ```
 
@@ -179,10 +220,13 @@ Para anadir un modulo: implementa `IOptimizerModule` en Core y registralo en
 `MainViewModel`. Si el modulo solo lee, hereda de `DiagnosticModule`: la
 interfaz lo detecta por `Kind` y muestra fichas con recomendaciones en vez de
 una tabla con casillas, y oculta los botones de aplicar.
+<<<<<<< HEAD
 
 Si el modulo cambia algo que se pueda revertir, anota un `ReversibleChange` en
 el `IChangeJournal` con el valor anterior, y anade el caso a `UndoModule`. Un
 modulo que cambia sin dejar vuelta atras deberia ser la excepcion y decirlo.
+=======
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
 ## Aviso
 

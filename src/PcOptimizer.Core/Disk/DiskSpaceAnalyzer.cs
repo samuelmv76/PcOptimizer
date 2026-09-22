@@ -20,7 +20,11 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
     public string DisplayName => "Espacio en disco";
 
     public string Description =>
+<<<<<<< HEAD
         "Dónde se está yendo el espacio. Solo ofrece borrar lo que se puede borrar con seguridad; del resto te dice cómo hacerlo tú.";
+=======
+        "Donde se esta yendo el espacio. Solo ofrece borrar lo que se puede borrar con seguridad; del resto te dice como hacerlo tu.";
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
     public bool RequiresElevation => true;
 
@@ -78,7 +82,11 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
                 Severity = runningLow ? FindingSeverity.Warning : FindingSeverity.Info,
                 Recommendation = runningLow
                     ? "Con menos del 10% libre Windows empieza a ir peor: las actualizaciones fallan "
+<<<<<<< HEAD
                       + "y, en un SSD, escribir se vuelve más lento."
+=======
+                      + "y, en un SSD, escribir se vuelve mas lento."
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                     : string.Empty
             };
         }
@@ -92,22 +100,36 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
         {
             (
                 "update-cache",
+<<<<<<< HEAD
                 "Caché de Windows Update",
+=======
+                "Cache de Windows Update",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 Path.Combine(windows, "SoftwareDistribution", "Download"),
                 "Instaladores ya aplicados. Windows los vuelve a descargar si los necesita."
             ),
             (
                 "delivery-optimization",
+<<<<<<< HEAD
                 "Caché de Optimización de entrega",
+=======
+                "Cache de Optimizacion de entrega",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 Path.Combine(windows, "ServiceProfiles", "NetworkService", "AppData", "Local",
                     "Microsoft", "Windows", "DeliveryOptimization", "Cache"),
                 "Trozos de actualizaciones guardados para compartir con otros equipos de la red."
             ),
             (
                 "windows-logs",
+<<<<<<< HEAD
                 "Registros de instalación de Windows",
                 Path.Combine(windows, "Logs", "CBS"),
                 "Registros de instalación de componentes. Solo sirven para diagnosticar fallos pasados."
+=======
+                "Registros de instalacion de Windows",
+                Path.Combine(windows, "Logs", "CBS"),
+                "Registros de instalacion de componentes. Solo sirven para diagnosticar fallos pasados."
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             )
         };
 
@@ -169,16 +191,27 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
         {
             yield return new SpaceFinding(
                 "windows-old",
+<<<<<<< HEAD
                 "Instalación anterior de Windows (Windows.old)",
+=======
+                "Instalacion anterior de Windows (Windows.old)",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 SpaceAction.None,
                 SafeDirectory.GetDirectorySize(previousInstall, cancellationToken))
             {
                 Details = previousInstall,
                 Severity = FindingSeverity.Suggestion,
+<<<<<<< HEAD
                 Recommendation = "Es tu Windows anterior, guardado para poder volver atrás. Borrarlo a mano "
                                  + "falla por permisos y deja restos: hazlo desde Configuración > Sistema > "
                                  + "Almacenamiento > Archivos temporales. Ojo: al quitarlo pierdes la opción "
                                  + "de revertir la actualización."
+=======
+                Recommendation = "Es tu Windows anterior, guardado para poder volver atras. Borrarlo a mano "
+                                 + "falla por permisos y deja restos: hazlo desde Configuracion > Sistema > "
+                                 + "Almacenamiento > Archivos temporales. Ojo: al quitarlo pierdes la opcion "
+                                 + "de revertir la actualizacion."
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             };
         }
 
@@ -192,13 +225,21 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
 
             yield return new SpaceFinding(
                 $"upgrade-leftover:{name}",
+<<<<<<< HEAD
                 $"Restos de actualización ({name})",
+=======
+                $"Restos de actualizacion ({name})",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 SpaceAction.None,
                 SafeDirectory.GetDirectorySize(path, cancellationToken))
             {
                 Details = path,
                 Severity = FindingSeverity.Suggestion,
+<<<<<<< HEAD
                 Recommendation = "Archivos de una actualización de versión. Se quitan desde Configuración > "
+=======
+                Recommendation = "Archivos de una actualizacion de version. Se quitan desde Configuracion > "
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                                  + "Sistema > Almacenamiento > Archivos temporales."
             };
         }
@@ -208,13 +249,21 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
         {
             yield return new SpaceFinding(
                 "winsxs",
+<<<<<<< HEAD
                 "Almacén de componentes (WinSxS)",
+=======
+                "Almacen de componentes (WinSxS)",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 SpaceAction.None,
                 0)
             {
                 Details = "Guarda las versiones anteriores de cada componente de Windows.",
                 Severity = FindingSeverity.Info,
+<<<<<<< HEAD
                 Recommendation = "Nunca lo borres a mano: Windows dejaría de poder actualizarse o repararse. "
+=======
+                Recommendation = "Nunca lo borres a mano: Windows dejaria de poder actualizarse o repararse. "
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                                  + "Para reducirlo, ejecuta en una consola de administrador: "
                                  + "Dism.exe /Online /Cleanup-Image /StartComponentCleanup"
             };
@@ -226,14 +275,22 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
         {
             yield return new SpaceFinding(
                 "hiberfil",
+<<<<<<< HEAD
                 "Archivo de hibernación (hiberfil.sys)",
+=======
+                "Archivo de hibernacion (hiberfil.sys)",
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 SpaceAction.None,
                 hibernationSize)
             {
                 Details = $"{ByteSize.Format(hibernationSize)} reservados en {systemDrive}",
                 Severity = FindingSeverity.Info,
                 Recommendation = "Se puede desactivar con 'powercfg /h off' en una consola de administrador, "
+<<<<<<< HEAD
                                  + "pero perderás la hibernación y el Inicio rápido. En un portátil no compensa."
+=======
+                                 + "pero perderas la hibernacion y el Inicio rapido. En un portatil no compensa."
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             };
         }
 
@@ -270,8 +327,13 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
             {
                 Details = $"{ByteSize.Format(size)} en {path}",
                 Severity = FindingSeverity.Info,
+<<<<<<< HEAD
                 Recommendation = "Son tus archivos: esta aplicación no los toca. Se lista para que veas "
                                  + "donde está el espacio."
+=======
+                Recommendation = "Son tus archivos: esta aplicacion no los toca. Se lista para que veas "
+                                 + "donde esta el espacio."
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             };
         }
     }
@@ -306,7 +368,11 @@ public sealed class DiskSpaceAnalyzer : IOptimizerModule
             if (finding.Action == SpaceAction.None)
             {
                 failed++;
+<<<<<<< HEAD
                 errors.Add($"{finding.Title}: esta aplicación no lo borra, mira la recomendación.");
+=======
+                errors.Add($"{finding.Title}: esta aplicacion no lo borra, mira la recomendacion.");
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 continue;
             }
 

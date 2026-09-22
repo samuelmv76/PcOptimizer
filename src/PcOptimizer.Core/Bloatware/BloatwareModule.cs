@@ -42,12 +42,19 @@ public sealed class BloatwareModule : IOptimizerModule
     public string DisplayName => "Aplicaciones preinstaladas";
 
     public string Description =>
+<<<<<<< HEAD
         "Aplicaciones que vinieron con el equipo o con Windows. Las piezas del sistema no aparecen aquí: no se ofrecen para desinstalar.";
 
     public bool RequiresElevation => false;
 
     public string ApplyVerb => "Desinstalar";
 
+=======
+        "Aplicaciones que vinieron con el equipo o con Windows. Las piezas del sistema no aparecen aqui: no se ofrecen para desinstalar.";
+
+    public bool RequiresElevation => false;
+
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     public bool BenefitsFromRestorePoint => true;
 
     public async Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)

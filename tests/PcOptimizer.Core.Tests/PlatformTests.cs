@@ -121,6 +121,7 @@ public sealed class SafeDirectoryTests : IDisposable
             () => SafeDirectory.EnumerateFiles(_root, cancellationToken: cancelled.Token).ToList());
     }
 }
+<<<<<<< HEAD
 
 public sealed class SettingsStoreTests : IDisposable
 {
@@ -178,3 +179,5 @@ public sealed class SettingsStoreTests : IDisposable
         Assert.Equal(PcOptimizer.Core.Configuration.AppSettings.Default, Store().Load());
     }
 }
+=======
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0

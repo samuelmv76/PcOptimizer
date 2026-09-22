@@ -89,8 +89,13 @@ public static class FileDeletion
 
             var code = Marshal.GetLastWin32Error();
             error = code == ErrorAccessDenied
+<<<<<<< HEAD
                 ? "hace falta ejecutar la aplicación como administrador"
                 : $"Windows devolvió el error {code}";
+=======
+                ? "hace falta ejecutar la aplicacion como administrador"
+                : $"Windows devolvio el error {code}";
+>>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
             return false;
         }
