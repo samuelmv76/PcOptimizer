@@ -11,6 +11,9 @@ namespace PcOptimizer.App.Converters;
 /// </summary>
 public sealed class SeverityToBrushConverter : IValueConverter
 {
+    private static readonly SolidColorBrush Info = Freeze("#8E8E93");
+    private static readonly SolidColorBrush Suggestion = Freeze("#0A84FF");
+    private static readonly SolidColorBrush Warning = Freeze("#FF9F0A");
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         => value switch

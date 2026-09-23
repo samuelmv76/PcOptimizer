@@ -8,7 +8,6 @@ using PcOptimizer.Core.Abstractions;
 using PcOptimizer.Core.Auditing;
 using PcOptimizer.Core.Bloatware;
 using PcOptimizer.Core.Cleaning;
-<<<<<<< HEAD
 using PcOptimizer.Core.Configuration;
 using PcOptimizer.Core.Disk;
 using PcOptimizer.Core.Firmware;
@@ -16,12 +15,6 @@ using PcOptimizer.Core.Hardware;
 using PcOptimizer.Core.Performance;
 using PcOptimizer.Core.Platform;
 using PcOptimizer.Core.Programs;
-=======
-using PcOptimizer.Core.Disk;
-using PcOptimizer.Core.Firmware;
-using PcOptimizer.Core.Hardware;
-using PcOptimizer.Core.Platform;
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 using PcOptimizer.Core.Safety;
 using PcOptimizer.Core.Services;
 using PcOptimizer.Core.Startup;
@@ -36,7 +29,6 @@ public partial class MainViewModel : ObservableObject
     private readonly IChangeJournal _journal;
     private readonly IRestorePointService _restorePoints;
     private readonly IUserPrompt _prompt;
-<<<<<<< HEAD
     private readonly SummaryModule _summary;
 
     /// <summary>
@@ -57,15 +49,11 @@ public partial class MainViewModel : ObservableObject
     /// <summary>Fichas del resumen que ya han llegado mientras sigue analizando.</summary>
     private readonly List<SelectableFinding> _liveCards = [];
 
-=======
-
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     private CancellationTokenSource? _work;
 
     public MainViewModel(
         IUserPrompt? prompt = null,
         IRestorePointService? restorePoints = null,
-<<<<<<< HEAD
         IAuditLog? audit = null,
         IChangeJournal? journal = null,
         SettingsStore? settingsStore = null,
@@ -73,13 +61,6 @@ public partial class MainViewModel : ObservableObject
     {
         var store = settingsStore ?? new SettingsStore();
         Settings = new SettingsViewModel(store, settings ?? store.Load());
-=======
-        IAuditLog? audit = null)
-    {
-        _prompt = prompt ?? new MessageBoxPrompt();
-        _audit = audit ?? new FileAuditLog();
-        _restorePoints = restorePoints ?? new WmiRestorePointService();
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
         _prompt = prompt ?? new MessageBoxPrompt();
         _audit = audit ?? new FileAuditLog();
@@ -98,7 +79,6 @@ public partial class MainViewModel : ObservableObject
 
         IOptimizerModule[] sections =
         [
-<<<<<<< HEAD
             new GamingPerformanceModule(_audit, _journal, hardware.Get),
             new TempFileCleaner(TempFileCleaner.DefaultTargets(), _audit),
             new DiskSpaceAnalyzer(_audit),
@@ -155,20 +135,6 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(SectionCards));
             OnPropertyChanged(nameof(HasFindings));
         };
-=======
-            new HardwareInventory(),
-            new TempFileCleaner(TempFileCleaner.DefaultTargets(), _audit),
-            new DiskSpaceAnalyzer(_audit),
-            new BloatwareModule(audit: _audit),
-            new StartupManager(_audit),
-            new FirmwareDiagnostics()
-        ];
-
-        IsElevated = CheckElevated();
-        _selectedModule = Modules[0];
-
-        Findings.CollectionChanged += (_, _) => RefreshSelectionSummary();
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         Errors.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasErrors));
     }
 
@@ -198,19 +164,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Por que no se pudo aplicar cada elemento. Se muestra entero: un
-    /// "3 fallidos" sin decir cual ni por que no le sirve a nadie.
-    /// </summary>
-    public ObservableCollection<string> Errors { get; } = [];
-
-    public bool HasErrors => Errors.Count > 0;
-
-    /// <summary>Si el proceso corre como administrador.</summary>
-    public bool IsElevated { get; }
-
     [ObservableProperty]
-<<<<<<< HEAD
     [NotifyPropertyChangedFor(nameof(SidebarSelection))]
     [NotifyPropertyChangedFor(nameof(PageKind))]
     [NotifyPropertyChangedFor(nameof(PageTitle))]
@@ -283,16 +237,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _status;
-=======
-    [NotifyPropertyChangedFor(nameof(IsDiagnostic))]
-    [NotifyPropertyChangedFor(nameof(NeedsElevationWarning))]
-    [NotifyPropertyChangedFor(nameof(ShowRestorePointOption))]
-    [NotifyPropertyChangedFor(nameof(ShowRebootDeletionOption))]
-    private IOptimizerModule _selectedModule;
-
-    [ObservableProperty]
-    private string _status = "Elige un apartado y pulsa Analizar.";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
@@ -323,7 +267,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _selectionSummary = string.Empty;
 
-<<<<<<< HEAD
     /// <summary>
     /// Lo que hace el modulo actual. Se expone desde aqui a proposito: un
     /// enlace de XAML resuelve por reflexion sobre el tipo concreto y no ve
@@ -337,12 +280,6 @@ public partial class MainViewModel : ObservableObject
     public bool IsDiagnostic => SelectedModule.Kind == ModuleKind.Diagnostic;
 
     public bool NeedsElevationWarning => !IsSettingsOpen && SelectedModule.RequiresElevation && !IsElevated;
-=======
-    /// <summary>El modulo actual solo informa: no hay nada que seleccionar ni aplicar.</summary>
-    public bool IsDiagnostic => SelectedModule.Kind == ModuleKind.Diagnostic;
-
-    public bool NeedsElevationWarning => SelectedModule.RequiresElevation && !IsElevated;
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
     /// <summary>
     /// Restaurar sistema no cubre ficheros: ofrecer un punto de restauracion
@@ -355,70 +292,17 @@ public partial class MainViewModel : ObservableObject
     partial void OnSelectedModuleChanged(IOptimizerModule value)
     {
         ClearResults();
-<<<<<<< HEAD
-=======
-        Status = $"{value.DisplayName}: pulsa Analizar.";
-    }
-
-    private bool CanWork() => !IsBusy;
-
-    [RelayCommand(CanExecute = nameof(CanWork))]
-    private Task ScanAsync() => RunScanAsync(preserveStatus: false);
-
-    [RelayCommand(CanExecute = nameof(CanWork))]
-    private Task SimulateAsync() => RunAsync(simulate: true);
-
-    [RelayCommand(CanExecute = nameof(CanWork))]
-    private Task ApplyAsync() => RunAsync(simulate: false);
-
-    [RelayCommand(CanExecute = nameof(IsBusy))]
-    private void Cancel()
-    {
-        _work?.Cancel();
-        Status = "Cancelando...";
-    }
-
-    [RelayCommand]
-    private void SelectAll() => SetSelection(true);
-
-    [RelayCommand]
-    private void SelectNone() => SetSelection(false);
-
-    /// <summary>
-    /// Analiza el modulo actual. Con preserveStatus el mensaje que ya hay no
-    /// se pisa: es el re-analisis que sigue a un Aplicar, y el resultado de
-    /// aquel es lo que el usuario necesita seguir leyendo.
-    /// </summary>
-    private async Task RunScanAsync(bool preserveStatus)
-    {
-        var module = SelectedModule;
-        var previousStatus = Status;
-
-        using var work = StartWork();
-        ClearResults();
-
-        if (!preserveStatus)
-        {
-            Status = $"Analizando {module.DisplayName}...";
-        }
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
         if (RestoreFromCache(value))
         {
-<<<<<<< HEAD
             return;
         }
-=======
-            var results = await Task.Run(
-                () => module.ScanAsync(work.Token), work.Token).ConfigureAwait(true);
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
         // El resumen sigue trabajando en segundo plano.
         if (IsBusy && _running is SummaryModule overview)
         {
             if (value is SummaryModule)
             {
-<<<<<<< HEAD
                 foreach (var card in _liveCards)
                 {
                     Findings.Add(Track(card));
@@ -432,18 +316,6 @@ public partial class MainViewModel : ObservableObject
                 Status = $"{value.DisplayName}: se está analizando con todo lo demás; aparecerá aquí en cuanto termine.";
                 return;
             }
-=======
-                Findings.Add(Track(new SelectableFinding(finding)));
-            }
-
-            Status = preserveStatus
-                ? $"{previousStatus} Quedan {results.Count} elementos."
-                : Summarize(module, results);
-        }
-        catch (OperationCanceledException)
-        {
-            Status = "Analisis cancelado.";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         }
 
         if (IsBusy && _running is { } other && !ReferenceEquals(other, value))
@@ -465,7 +337,6 @@ public partial class MainViewModel : ObservableObject
     {
         if (!_scans.TryGetValue(module.Id, out var cached))
         {
-<<<<<<< HEAD
             return false;
         }
 
@@ -644,14 +515,6 @@ public partial class MainViewModel : ObservableObject
 
     private async Task RunCoreAsync(bool simulate)
     {
-=======
-            EndWork();
-        }
-    }
-
-    private async Task RunAsync(bool simulate)
-    {
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         var module = SelectedModule;
 
         if (module.Kind == ModuleKind.Diagnostic)
@@ -687,22 +550,14 @@ public partial class MainViewModel : ObservableObject
         {
             if (!simulate && useRestorePoint)
             {
-<<<<<<< HEAD
                 Status = "Creando punto de restauración...";
-=======
-                Status = "Creando punto de restauracion...";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
                 var failure = await Task.Run(CreateRestorePointOrDescribeFailure, work.Token)
                     .ConfigureAwait(true);
 
                 if (failure is not null && !ConfirmWithoutRestorePoint(failure))
                 {
-<<<<<<< HEAD
                     Status = $"No se pudo crear el punto de restauración: {failure}. "
-=======
-                    Status = $"No se pudo crear el punto de restauracion: {failure}. "
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                              + "No se ha cambiado nada.";
                     return;
                 }
@@ -725,13 +580,8 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-<<<<<<< HEAD
             Status = "Operación cancelada. Lo ya aplicado no se deshace solo: "
                      + "revisa el registro de auditoría.";
-=======
-            Status = "Operacion cancelada. Lo ya aplicado no se deshace solo: "
-                     + "revisa el registro de auditoria.";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             return;
         }
         catch (Exception ex)
@@ -751,28 +601,22 @@ public partial class MainViewModel : ObservableObject
             Errors.Add(error);
         }
 
-<<<<<<< HEAD
         if (!simulate && result.RequiresRestart && result.Applied > 0)
         {
             OfferRestart();
         }
 
-=======
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         // Tras aplicar de verdad, la lista esta desfasada. Se vuelve a
         // analizar, pero conservando el mensaje: es el resultado de lo que
         // el usuario acaba de hacer y es lo que quiere leer.
         if (!simulate)
         {
-<<<<<<< HEAD
             // Aplicar en un apartado puede cambiar lo que ven otros (quitar un
             // programa quita su servicio y su entrada de arranque; deshacer
             // cambia el rendimiento). Nada de lo guardado es ya fiable, ni
             // siquiera lo de este apartado si el re-analisis fallara.
             _scans.Clear();
 
-=======
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             var reportedErrors = Errors.ToList();
 
             await RunScanAsync(preserveStatus: true).ConfigureAwait(true);
@@ -791,20 +635,13 @@ public partial class MainViewModel : ObservableObject
 
         return _prompt.ConfirmDestructive(
             "Confirmar",
-<<<<<<< HEAD
             $"{module.ApplyVerb} sobre {selected.Count} elementos{size} en \"{module.DisplayName}\".\n\n"
             + "Esta acción no se puede deshacer desde la aplicación.\n\n"
             + "Si prefieres ver antes qué pasaría sin tocar nada, cancela y pulsa Simular.");
-=======
-            $"Se va a aplicar sobre {selected.Count} elementos{size} en \"{module.DisplayName}\".\n\n"
-            + "Esta accion no se puede deshacer desde la aplicacion.\n\n"
-            + "Si prefieres ver antes que pasaria sin tocar nada, cancela y pulsa Simular.");
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     }
 
     private bool ConfirmWithoutRestorePoint(string failure)
         => _prompt.ConfirmDestructive(
-<<<<<<< HEAD
             "Sin punto de restauración",
             $"No se ha podido crear el punto de restauración: {failure}\n\n"
             + "Puedes continuar de todos modos, pero no habrá vuelta atrás automática.\n\n"
@@ -842,12 +679,6 @@ public partial class MainViewModel : ObservableObject
             Status += $" No se pudo reiniciar: {ex.Message}. Reinicia tú cuando quieras.";
         }
     }
-=======
-            "Sin punto de restauracion",
-            $"No se ha podido crear el punto de restauracion: {failure}\n\n"
-            + "Puedes continuar de todos modos, pero no habra vuelta atras automatica.\n\n"
-            + "Aceptar para continuar sin punto de restauracion.");
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
     /// <summary>Devuelve null si se creo el punto, o el motivo del fallo.</summary>
     private string? CreateRestorePointOrDescribeFailure()
@@ -855,7 +686,6 @@ public partial class MainViewModel : ObservableObject
             ? null
             : error ?? "motivo desconocido";
 
-<<<<<<< HEAD
     private void Remember(IOptimizerModule module, IReadOnlyList<SelectableFinding> items, string summary)
         => _scans[module.Id] = new CachedScan(items, DateTime.Now, summary);
 
@@ -888,10 +718,6 @@ public partial class MainViewModel : ObservableObject
                 : $"{sections.Count} apartados revisados, {withWork} con cosas que hacer{space}.";
         }
 
-=======
-    private static string Summarize(IOptimizerModule module, IReadOnlyList<Finding> results)
-    {
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         if (results.Count == 0)
         {
             return "No se ha encontrado nada.";
@@ -915,11 +741,7 @@ public partial class MainViewModel : ObservableObject
 
     private static string Describe(RemediationResult result)
     {
-<<<<<<< HEAD
         var prefix = result.Simulated ? "Simulación" : "Aplicado";
-=======
-        var prefix = result.Simulated ? "Simulacion" : "Aplicado";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         var parts = new List<string> { $"{result.Applied} correctos" };
 
         if (result.Failed > 0)
@@ -929,21 +751,13 @@ public partial class MainViewModel : ObservableObject
 
         if (result.Deferred > 0)
         {
-<<<<<<< HEAD
             parts.Add($"{result.Deferred} se borrarán al reiniciar");
-=======
-            parts.Add($"{result.Deferred} se borraran al reiniciar");
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
         }
 
         if (result.BytesFreed > 0)
         {
             parts.Add(result.Simulated
-<<<<<<< HEAD
                 ? $"{ByteSize.Format(result.BytesFreed)} se liberarían"
-=======
-                ? $"{ByteSize.Format(result.BytesFreed)} se liberarian"
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
                 : $"{ByteSize.Format(result.BytesFreed)} liberados");
         }
 

@@ -31,9 +31,6 @@ public sealed class TempFileCleaner : IOptimizerModule
     public string Description =>
         "Borra ficheros temporales con más de 24 horas de un conjunto cerrado de carpetas del sistema. Nunca entra en Documentos ni en Descargas.";
 
-    public string Description =>
-        "Borra ficheros temporales con mas de 24 horas de un conjunto cerrado de carpetas del sistema. Nunca entra en Documentos ni en Descargas.";
-
     public bool RequiresElevation => true;
 
     public bool SupportsRebootDeletion => true;
@@ -134,11 +131,7 @@ public sealed class TempFileCleaner : IOptimizerModule
             {
                 _audit.Record(Id, "delete-file-on-reboot", finding.FullPath, simulated: false);
                 deferred++;
-<<<<<<< HEAD
                 errors.Add($"{Path.GetFileName(finding.FullPath)}: en uso, se borrará al reiniciar.");
-=======
-                errors.Add($"{Path.GetFileName(finding.FullPath)}: en uso, se borrara al reiniciar.");
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
             }
             else
             {

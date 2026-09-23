@@ -36,15 +36,12 @@ public interface IOptimizerModule
     /// </summary>
     bool SupportsRebootDeletion => false;
 
-<<<<<<< HEAD
     /// <summary>
     /// Como se llama la accion en el boton. "Aplicar" no describe bien
     /// desinstalar un programa ni deshacer un cambio.
     /// </summary>
     string ApplyVerb => "Aplicar";
 
-=======
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
     Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default);
 
     Task<RemediationResult> ApplyAsync(

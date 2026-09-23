@@ -27,11 +27,7 @@ public sealed class FirmwareDiagnostics : DiagnosticModule
     public override string DisplayName => "Firmware y BIOS";
 
     public override string Description =>
-<<<<<<< HEAD
         "Ajustes de firmware que afectan al rendimiento y a la compatibilidad, con el menú exacto de tu placa donde se cambian. Para entrar en la BIOS sin pulsar teclas, usa Arranque y BIOS.";
-=======
-        "Ajustes de firmware que afectan al rendimiento y a la compatibilidad. Esta aplicacion no escribe en la BIOS: te dice que cambiar y donde.";
->>>>>>> 77a6a47fbf3cb9b7c8cc565933bd42c37265aab0
 
     public override Task<IReadOnlyList<Finding>> ScanAsync(CancellationToken cancellationToken = default)
     {

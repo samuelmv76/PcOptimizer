@@ -9,7 +9,9 @@ public sealed class SeverityToLabelConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         => value switch
         {
+            FindingSeverity.Warning => "Atención",
             FindingSeverity.Suggestion => "Sugerencia",
+            _ => "Información"
         };
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
